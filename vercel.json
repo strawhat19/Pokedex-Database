@@ -1,0 +1,16 @@
+{
+  "framework": null,
+  "outputDirectory": "dist/client",
+  "buildCommand": "npm run export:web",
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "dist/server/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ]
+}
