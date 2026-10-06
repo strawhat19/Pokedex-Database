@@ -1,0 +1,66 @@
+.info-page { padding-block: 40px 30px; }
+.info-back { margin-bottom: 35px; color: var(--muted); font-size: 10px; }
+.info-hero { max-width: 760px; margin-bottom: 45px; }
+.info-hero h1 { margin-top: 21px; font-size: 57px; font-weight: 500; letter-spacing: -2.5px; }
+.info-hero > p { max-width: 620px; margin-top: 23px; color: var(--muted); font-size: 14px; line-height: 1.9; }
+.info-blocks { max-width: 880px; }
+.info-block { display: flex; gap: 28px; padding-block: 30px; border-top: 1px solid var(--line); }
+.info-block-number { padding-top: 5px; color: var(--muted); font: 10px var(--display); }
+.info-block h2 { font-size: 25px; letter-spacing: -.6px; }
+.info-block p { margin-top: 15px; color: var(--muted); font-size: 13px; line-height: 1.9; }
+.info-action { margin-top: 25px; }
+.info-region-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.info-region-card { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 280px; padding: 35px; border: 1px solid var(--line); border-radius: 15px; background: var(--mint); transition: transform .25s; }
+.info-region-card:hover { transform: translateY(-4px); }
+.info-region-gold { background: color-mix(in srgb,#f4edd9 70%,var(--surface)); }
+.info-region-blue { background: color-mix(in srgb,#e7eff5 70%,var(--surface)); }
+.info-region-purple { background: color-mix(in srgb,#efebf4 70%,var(--surface)); }
+:root[data-theme='dark'] .info-region-card { background: var(--mint); }
+.info-region-card > img { width: 140px; height: 160px; object-fit: contain; filter: drop-shadow(0 12px 6px #243d3112); }
+.info-region-card .eyebrow { font-size: 7px; letter-spacing: 1px; }
+.info-region-card h2 { margin-top: 19px; font-size: 37px; letter-spacing: -1px; }
+.info-region-card p { margin-top: 10px; color: var(--muted); font-size: 11px; }
+.info-region-games { display: block; margin-top: 15px; color: var(--muted); font-size: 8px; }
+.info-region-card .text-link { margin-top: 20px; font-size: 9px; }
+.api-doc-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 40px; }
+.api-doc-actions .button { font-size: 10px; }
+.api-doc-actions .text-link { font-size: 10px; margin-left: 8px; }
+.api-endpoints { max-width: 1000px; margin-bottom: 45px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.api-doc-section-title { display: flex; align-items: center; gap: 11px; padding: 20px; }
+.api-doc-section-title h2 { font-size: 22px; letter-spacing: -.5px; }
+.api-doc-section-title > span { margin-left: auto; color: var(--muted); font: 8px var(--display); letter-spacing: 1px; }
+.api-endpoint-row { display: flex; align-items: center; gap: 15px; padding: 22px; border-top: 1px solid var(--line); }
+.api-method { padding: 4px 7px; border-radius: 4px; color: var(--green); background: var(--mint); font: 9px monospace; }
+.api-endpoint-row > div { display: flex; flex-direction: column; gap: 6px; }
+.api-endpoint-row code { font-size: 12px; overflow-wrap: anywhere; }
+.api-endpoint-row > div > span { color: var(--muted); font-size: 9px; }
+.api-endpoint-row > p { margin-left: auto; color: var(--muted); font-size: 9px; max-width: 250px; text-align: right; }
+.api-playground { max-width: 1000px; margin-bottom: 45px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.api-playground .api-doc-section-title > button { min-height: 33px; margin-left: auto; padding: 8px 12px; font-size: 9px; }
+.api-playground-url { display: flex; gap: 12px; padding: 14px 20px; border-block: 1px solid var(--line); font-size: 11px; }
+.api-playground-url > span { color: var(--green); font-size: 9px; }
+.api-playground > pre { min-height: 140px; max-height: 460px; overflow: auto; margin: 0; padding: 20px; color: #c6d7bb; background: #1c3126; font: 11px/1.8 monospace; }
+@media (max-width: 900px) { .info-region-card { padding: 25px; } .info-region-card > img { width: 110px; } .info-region-card h2 { font-size: 31px; } }
+@media (max-width: 640px) {
+  .info-page { padding-top: 25px; }
+  .info-back { margin-bottom: 28px; }
+  .info-hero { margin-bottom: 30px; }
+  .info-hero h1 { font-size: 39px; letter-spacing: -1.7px; }
+  .info-hero > p { font-size: 12px; margin-top: 18px; }
+  .info-hero .eyebrow { font-size: 8px; letter-spacing: 1.4px; }
+  .info-block { gap: 18px; padding-block: 24px; }
+  .info-block h2 { font-size: 22px; }
+  .info-block p { font-size: 11px; }
+  .info-region-grid { grid-template-columns: 1fr; gap: 15px; }
+  .info-region-card { min-height: 240px; padding: 25px; }
+  .info-region-card > img { width: 125px; }
+  .api-doc-actions { gap: 10px; }
+  .api-doc-actions .button { font-size: 9px; padding: 11px 13px; }
+  .api-endpoint-row { align-items: flex-start; flex-wrap: wrap; gap: 10px; padding: 18px; }
+  .api-endpoint-row code { font-size: 10px; }
+  .api-endpoint-row > div { flex: 1; }
+  .api-endpoint-row > p { text-align: left; width: 100%; max-width: 100%; margin-left: 42px; font-size: 8px; }
+  .api-doc-section-title { padding: 18px; gap: 8px; }
+  .api-doc-section-title h2 { font-size: 19px; }
+  .api-playground .api-doc-section-title > button { font-size: 8px; padding: 8px; gap: 5px; }
+}

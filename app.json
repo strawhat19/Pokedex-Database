@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Pokedex Database",
+    "slug": "pokedex-database",
+    "scheme": "pokedex-database",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.piratechs.pokedexdatabase" },
+    "android": { "package": "com.piratechs.pokedexdatabase" },
+    "web": {
+      "bundler": "metro",
+      "output": "server",
+      "name": "Pokedex Database",
+      "shortName": "Pokedex",
+      "favicon": "./assets/pokeball.png"
+    },
+    "plugins": ["expo-router", "expo-font"],
+    "experiments": { "typedRoutes": true }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "/",
+  "name": "Pokedex Database",
+  "short_name": "Pokedex",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7faf7",
+  "theme_color": "#eaf4ed",
+  "description": "A companion for your Pokémon adventure, from Kanto to Sinnoh.",
+  "icons": [
+    { "src": "/media/app-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Open Pokédex", "url": "/pokedex" },
+    { "name": "My teams", "url": "/teams" }
+  ]
+}

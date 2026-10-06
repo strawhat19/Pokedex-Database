@@ -1,0 +1,1391 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Pokedex Database API",
+    "version": "1.0.0",
+    "description": "A normalized, read-only API for National Pokédex species #001–493. Live data is fetched server-side from PokéAPI, cached for six hours, and never substituted with fabricated records. English flavor text is limited to generation 1–4 games. Current PokéAPI types, abilities and stats are returned. Trainer accounts, votes and teams are local app services, not public HTTP resources. Server deployment and commercial asset/data permissions must be resolved before a marketplace release."
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "The deployed app server; native clients configure EXPO_PUBLIC_API_ORIGIN"
+    }
+  ],
+  "security": [
+    {},
+    {
+      "apiKey": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Directory"
+    },
+    {
+      "name": "Pokémon"
+    }
+  ],
+  "paths": {
+    "/api": {
+      "get": {
+        "tags": [
+          "Directory"
+        ],
+        "security": [],
+        "operationId": "getDirectory",
+        "summary": "API directory and connection metadata",
+        "responses": {
+          "200": {
+            "description": "Directory",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "requestId",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "requestId": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Directory"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Per-process rate limit exceeded. Observe Retry-After.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The request could not be completed. The status and error code identify the failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Directory"
+        ],
+        "security": [],
+        "operationId": "getHealth",
+        "summary": "Runtime health and actual cache status",
+        "description": "Readiness of this process. It does not probe the PokéAPI upstream.",
+        "responses": {
+          "200": {
+            "description": "Health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "requestId",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "requestId": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Health"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Per-process rate limit exceeded. Observe Retry-After.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The request could not be completed. The status and error code identify the failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/status": {
+      "get": {
+        "tags": [
+          "Directory"
+        ],
+        "security": [],
+        "operationId": "getStatus",
+        "summary": "Alias of health",
+        "responses": {
+          "200": {
+            "description": "Health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "requestId",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "requestId": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Health"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Per-process rate limit exceeded. Observe Retry-After.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The request could not be completed. The status and error code identify the failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pokemon": {
+      "get": {
+        "tags": [
+          "Pokémon"
+        ],
+        "operationId": "listPokemon",
+        "summary": "List complete Pokémon entry cards",
+        "description": "Results are ordered by National Pokédex number. Search accepts a partial species name or exact numerical ID. Type filtering reflects current PokéAPI typing. On an upstream failure the request fails honestly; partial pages are not silently returned.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 80
+            },
+            "description": "Partial species name or exact National Pokédex number, e.g. pikachu, 025 or #025. Decimal and signed values are not converted to IDs."
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "bug",
+                "dark",
+                "ice",
+                "fire",
+                "rock",
+                "fairy",
+                "ghost",
+                "grass",
+                "steel",
+                "water",
+                "dragon",
+                "flying",
+                "ground",
+                "normal",
+                "poison",
+                "psychic",
+                "electric",
+                "fighting"
+              ],
+              "default": "all"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 24,
+              "default": 12
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 493,
+              "default": 0
+            }
+          },
+          {
+            "in": "query",
+            "name": "generation",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "1",
+                "2",
+                "3",
+                "4"
+              ],
+              "default": "all"
+            }
+          },
+          {
+            "in": "query",
+            "name": "shiny",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Presentation preference echoed in filters. Both standard and shiny artwork are returned for every card; this does not filter species."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "requestId",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "requestId": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/PokemonCard"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Configured API key missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found or outside generations 1–4",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Per-process rate limit exceeded. Observe Retry-After.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded upstream queue is full",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Upstream timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The request could not be completed. The status and error code identify the failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pokemon/{id}": {
+      "get": {
+        "tags": [
+          "Pokémon"
+        ],
+        "operationId": "getPokemon",
+        "summary": "Get a species detail with evolution methods",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "National Pokédex number (1–493), including leading zeros or # prefix, or a canonical species name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "requestId",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "requestId": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/PokemonDetail"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Configured API key missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found or outside generations 1–4",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Per-process rate limit exceeded. Observe Retry-After.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded upstream queue is full",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Upstream timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The request could not be completed. The status and error code identify the failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pokemon/{id}/evolutions": {
+      "get": {
+        "tags": [
+          "Pokémon"
+        ],
+        "operationId": "getEvolutions",
+        "summary": "Get branching evolution relationships and original constraints",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "National Pokédex number (1–493), including leading zeros or # prefix, or a canonical species name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "requestId",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": true
+                    },
+                    "requestId": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Evolution"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Configured API key missing or invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found or outside generations 1–4",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Per-process rate limit exceeded. Observe Retry-After.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Bounded upstream queue is full",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Upstream timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The request could not be completed. The status and error code identify the failure.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Optional server-only API_KEY setting enables this requirement on v1 resources. Do not embed a private key in EXPO_PUBLIC_ variables or client bundles. A public frontend then requires an authenticated server-side proxy. RapidAPI gateway credentials, billing, quota enforcement and shared rate limiting are not implemented."
+      }
+    },
+    "schemas": {
+      "Artwork": {
+        "type": "object",
+        "required": [
+          "default",
+          "shiny",
+          "sprite",
+          "shinySprite"
+        ],
+        "properties": {
+          "default": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "shiny": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sprite": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "shinySprite": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Stat": {
+        "type": "object",
+        "required": [
+          "name",
+          "value",
+          "effort"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "integer"
+          },
+          "effort": {
+            "type": "integer"
+          }
+        }
+      },
+      "Ability": {
+        "type": "object",
+        "required": [
+          "name",
+          "slot",
+          "isHidden"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "integer"
+          },
+          "isHidden": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Description": {
+        "type": "object",
+        "required": [
+          "text",
+          "version",
+          "language"
+        ],
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "language": {
+            "const": "en"
+          }
+        }
+      },
+      "PokemonCard": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "category",
+          "displayName",
+          "description",
+          "weightKg",
+          "heightMeters",
+          "generation",
+          "types",
+          "artwork",
+          "stats",
+          "abilities",
+          "descriptions",
+          "baseExperience"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 493
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "weightKg": {
+            "type": "number"
+          },
+          "heightMeters": {
+            "type": "number"
+          },
+          "generation": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "bug",
+                "dark",
+                "ice",
+                "fire",
+                "rock",
+                "fairy",
+                "ghost",
+                "grass",
+                "steel",
+                "water",
+                "dragon",
+                "flying",
+                "ground",
+                "normal",
+                "poison",
+                "psychic",
+                "electric",
+                "fighting"
+              ]
+            }
+          },
+          "artwork": {
+            "$ref": "#/components/schemas/Artwork"
+          },
+          "stats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Stat"
+            }
+          },
+          "abilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ability"
+            }
+          },
+          "descriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Description"
+            }
+          },
+          "baseExperience": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        }
+      },
+      "PokemonDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PokemonCard"
+          },
+          {
+            "type": "object",
+            "required": [
+              "habitat",
+              "isBaby",
+              "isMythical",
+              "isLegendary",
+              "genderRate",
+              "captureRate",
+              "baseHappiness",
+              "growthRate",
+              "eggGroups",
+              "evolutions"
+            ],
+            "properties": {
+              "habitat": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "isBaby": {
+                "type": "boolean"
+              },
+              "isMythical": {
+                "type": "boolean"
+              },
+              "isLegendary": {
+                "type": "boolean"
+              },
+              "genderRate": {
+                "type": "integer"
+              },
+              "captureRate": {
+                "type": "integer"
+              },
+              "baseHappiness": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "growthRate": {
+                "type": "string"
+              },
+              "eggGroups": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "evolutions": {
+                "$ref": "#/components/schemas/Evolution"
+              }
+            }
+          }
+        ]
+      },
+      "EvolutionMethod": {
+        "type": "object",
+        "required": [
+          "method",
+          "trigger",
+          "conditions",
+          "versionGroup",
+          "raw"
+        ],
+        "properties": {
+          "method": {
+            "type": "string"
+          },
+          "trigger": {
+            "type": "string"
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "versionGroup": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "raw": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Unmodified PokéAPI evolution_detail object, including all item, level, friendship, beauty, location, gender, move, party, trade, time and version constraints supplied upstream"
+          }
+        }
+      },
+      "EvolutionNode": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "isBaby",
+          "displayName",
+          "evolvesFrom",
+          "evolvesTo"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "isBaby": {
+            "type": "boolean"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "evolvesFrom": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "evolvesTo": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "EvolutionEdge": {
+        "type": "object",
+        "required": [
+          "to",
+          "from",
+          "methods"
+        ],
+        "properties": {
+          "to": {
+            "type": "integer"
+          },
+          "from": {
+            "type": "integer"
+          },
+          "methods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvolutionMethod"
+            }
+          }
+        }
+      },
+      "Evolution": {
+        "type": "object",
+        "required": [
+          "id",
+          "nodes",
+          "edges",
+          "babyTriggerItem",
+          "scope",
+          "note"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvolutionNode"
+            }
+          },
+          "edges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvolutionEdge"
+            }
+          },
+          "babyTriggerItem": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "scope": {
+            "const": "generations-1-4"
+          },
+          "note": {
+            "type": "string",
+            "description": "Version caveat: versioned methods are restricted through HeartGold/SoulSilver; unversioned methods and special triggers can need game-specific steps not supplied by PokéAPI."
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "required": [
+          "total",
+          "limit",
+          "offset",
+          "next",
+          "previous"
+        ],
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "next": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "previous": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        }
+      },
+      "Meta": {
+        "type": "object",
+        "required": [
+          "version",
+          "source",
+          "timestamp",
+          "storageMode",
+          "limits"
+        ],
+        "properties": {
+          "version": {
+            "const": "v1"
+          },
+          "source": {
+            "const": "PokéAPI"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "storageMode": {
+            "const": "server-memory-cache"
+          },
+          "limits": {
+            "type": "object",
+            "required": [
+              "species",
+              "generations",
+              "maxPageSize"
+            ],
+            "properties": {
+              "species": {
+                "const": 493
+              },
+              "generations": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "maxPageSize": {
+                "const": 24
+              }
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "filters": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "required": [
+          "success",
+          "data",
+          "requestId",
+          "meta",
+          "error"
+        ],
+        "properties": {
+          "success": {
+            "const": false
+          },
+          "data": {
+            "type": "null"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          },
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message",
+              "retryable"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "retryable": {
+                "type": "boolean"
+              },
+              "retryAfterSeconds": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "Directory": {
+        "type": "object",
+        "required": [
+          "title",
+          "connection",
+          "storageMode",
+          "timestamp",
+          "success",
+          "operations"
+        ],
+        "properties": {
+          "title": {
+            "const": "Pokedex Database API"
+          },
+          "connection": {
+            "type": "string"
+          },
+          "storageMode": {
+            "const": "server-memory-cache"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "success": {
+            "const": true
+          },
+          "status": {
+            "const": "connected"
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "method",
+                "path",
+                "description"
+              ],
+              "properties": {
+                "method": {
+                  "const": "GET"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "specification": {
+            "const": "/openapi.json"
+          },
+          "authentication": {
+            "type": "string"
+          },
+          "dataScope": {
+            "type": "string"
+          },
+          "localServices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "localServicesNote": {
+            "type": "string"
+          }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": [
+          "status",
+          "timestamp",
+          "uptimeSeconds",
+          "cache",
+          "message"
+        ],
+        "properties": {
+          "status": {
+            "const": "ready"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uptimeSeconds": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "cache": {
+            "type": "object",
+            "required": [
+              "entries",
+              "inFlight",
+              "queued",
+              "ttlSeconds",
+              "maxEntries",
+              "maxConcurrent",
+              "maxQueued",
+              "queueTimeoutSeconds"
+            ],
+            "properties": {
+              "entries": {
+                "type": "integer"
+              },
+              "inFlight": {
+                "type": "integer"
+              },
+              "queued": {
+                "type": "integer"
+              },
+              "ttlSeconds": {
+                "type": "integer"
+              },
+              "maxEntries": {
+                "type": "integer"
+              },
+              "maxConcurrent": {
+                "type": "integer"
+              },
+              "maxQueued": {
+                "type": "integer"
+              },
+              "queueTimeoutSeconds": {
+                "type": "integer"
+              }
+            }
+          },
+          "memoryBytes": {
+            "type": "object",
+            "required": [
+              "rss",
+              "heapUsed"
+            ],
+            "properties": {
+              "rss": {
+                "type": "integer"
+              },
+              "heapUsed": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-development-limits": {
+    "requestsPerMinutePerProcess": 120,
+    "rateLimitNote": "Without API_TRUST_PROXY=true, the development process uses one shared request bucket. Behind a trusted proxy, X-Forwarded-For separates clients. Multi-instance production requires a shared gateway or rate-limit store.",
+    "cacheMaxEntries": 1200,
+    "upstreamTimeoutSeconds": 15,
+    "upstreamMaxConcurrent": 8,
+    "upstreamMaxQueued": 128,
+    "upstreamQueueTimeoutSeconds": 15
+  }
+}

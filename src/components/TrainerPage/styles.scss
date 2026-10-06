@@ -1,0 +1,7 @@
+.trainer-access-page { min-height: 58dvh; padding-top: 38px; }
+.trainer-access-page > .text-link { color: var(--muted); font-size: 10px; }
+.trainer-access-intro { display: flex; flex-direction: column; align-items: center; gap: 20px; padding-block: 90px; }
+.trainer-access-intro > svg { color: var(--green); }
+.trainer-access-intro h1 { font-size: 44px; letter-spacing: -1.6px; }
+.trainer-access-intro p { color: var(--muted); }
+@media (max-width: 640px) { .trainer-access-intro h1 { font-size: 31px; } }

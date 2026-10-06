@@ -1,0 +1,45 @@
+import { StyleSheet } from 'react-native';
+import type { ThemePalette } from '../../styles/theme/theme';
+
+export const createCardStyles = (palette: ThemePalette) => StyleSheet.create({
+  card: { padding: 19, borderWidth: 1, borderRadius: 20, borderColor: palette.border, backgroundColor: palette.surface },
+  top: { flexDirection: `row`, alignItems: `center`, justifyContent: `space-between` },
+  number: { fontSize: 11, letterSpacing: 1, color: palette.muted, fontFamily: `Inter` },
+  shinyButton: { minHeight: 32, flexDirection: `row`, alignItems: `center`, gap: 5, paddingHorizontal: 10, borderWidth: 1, borderRadius: 9, borderColor: palette.border, backgroundColor: palette.surface },
+  shinySelected: { borderColor: palette.green, backgroundColor: palette.surfaceAlt },
+  shinyText: { fontSize: 10, color: palette.muted, fontFamily: `Inter` },
+  artField: { height: 200, marginTop: 12, borderRadius: 14, justifyContent: `center`, alignItems: `center`, overflow: `hidden`, backgroundColor: palette.surfaceAlt },
+  artCircle: { position: `absolute`, width: 140, height: 140, borderRadius: 70, opacity: 0.25 },
+  artwork: { width: `93%`, height: 192, resizeMode: `contain` },
+  name: { marginTop: 17, fontSize: 25, color: palette.text, fontFamily: `SpaceGrotesk`, fontWeight: `700` },
+  category: { marginTop: 3, fontSize: 11, color: palette.muted, fontFamily: `Inter` },
+  types: { marginTop: 11, flexDirection: `row`, gap: 5 },
+  type: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 },
+  typeText: { fontSize: 10, fontFamily: `Inter`, fontWeight: `700`, textTransform: `capitalize`, color: `#253326` },
+  descriptionHeader: { marginTop: 18, flexDirection: `row`, alignItems: `center`, justifyContent: `space-between` },
+  descriptionLabel: { fontSize: 9, letterSpacing: 1, color: palette.muted, fontFamily: `Inter`, textTransform: `uppercase` },
+  versionButton: { flexDirection: `row`, alignItems: `center`, gap: 4, paddingVertical: 5 },
+  versionLabel: { maxWidth: 160, fontSize: 10, color: palette.muted, fontFamily: `Inter`, textTransform: `capitalize` },
+  description: { minHeight: 63, marginTop: 6, fontSize: 12, lineHeight: 20, color: palette.muted, fontFamily: `Inter` },
+  measures: { marginTop: 17, paddingTop: 13, paddingBottom: 13, borderTopWidth: 1, borderBottomWidth: 1, borderColor: palette.border, flexDirection: `row` },
+  measure: { flex: 1, gap: 3 },
+  measureValue: { fontSize: 12, color: palette.text, fontFamily: `Inter`, fontWeight: `600` },
+  measureLabel: { fontSize: 9, color: palette.muted, fontFamily: `Inter` },
+  footer: { marginTop: 15, flexDirection: `row`, alignItems: `center`, justifyContent: `space-between`, gap: 8 },
+  votes: { flexDirection: `row`, alignItems: `center`, gap: 4 },
+  voteButton: { minWidth: 32, minHeight: 34, alignItems: `center`, justifyContent: `center`, borderRadius: 7, backgroundColor: palette.surfaceAlt },
+  voteSelected: { backgroundColor: palette.green },
+  score: { minWidth: 22, textAlign: `center`, fontSize: 12, color: palette.text, fontFamily: `Inter`, fontWeight: `700` },
+  addButton: { minHeight: 35, paddingHorizontal: 12, paddingVertical: 9, flexDirection: `row`, alignItems: `center`, gap: 5, borderRadius: 8, backgroundColor: palette.text },
+  addText: { fontSize: 10, color: palette.surface, fontFamily: `Inter`, fontWeight: `700` },
+  detailButton: { marginTop: 14, padding: 8, alignSelf: `center`, flexDirection: `row`, alignItems: `center`, gap: 5 },
+  detailText: { fontSize: 10, color: palette.muted, fontFamily: `Inter` },
+});
+
+export const typeColors: Record<string, string> = {
+  ice: `#d2eceb`, bug: `#dce8b4`, fire: `#ffd5b7`, dark: `#d9d4cc`,
+  rock: `#e6ddc0`, steel: `#dce1e5`, ghost: `#ddd5ed`, grass: `#d4ebc6`,
+  water: `#cce5f8`, fairy: `#f2d7e7`, ground: `#f0dfba`, flying: `#dedaf7`,
+  normal: `#e7e4d9`, poison: `#e4d0eb`, dragon: `#dbd1f9`, psychic: `#f9d3de`,
+  fighting: `#f4d0c2`, electric: `#f4e9b3`,
+};
